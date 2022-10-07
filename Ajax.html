@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <h1>Ajax 실행</h1>
+    <button id="btn">Ajax를 사용한 버튼</button>
+    <p id="print"></p>
+
+    <h3>A태그를 이용한 값 가져오기</h3>
+    <a href="./data.txt">text값</a>
+    <hr><br>
+
+    <button id ="json-btn">json 가져오는 버튼</button>
+    <p id ="json-print"></p>
+
+    <script>
+        // http 요청을 할 수있는 객체를 생성
+        const req = new XMLHttpRequest();
+        // 객체를 통해서 통신상태에 대해 알 수있음
+        console.log(req.readyState);
+
+        //서버에 요청
+        req.open("GET", "./data.txt")
+
+        // 요청전송
+        req.send();
+        // 응답확인 > send() 를 보내자마자 확인했기에, 안에 값이 없다 
+        console.log(req.response)
+
+       // onreadystatechange : 이 함수를 수정해서 사용 
+       // readystate 의 값이 바뀔때마다 함수가 실행됨 
+
+       /*
+       readyState 0~4 
+       0: open 메소드 호출전 
+       1: open 메소드 호출후, send 메소드 호출전
+       2: 보낸 요청에 대해 응답헤더가 수신된 후 - 응답 헤더만 수신 : response X 
+       3: 응답의 바디 부분이 수신 중 일때 - post , update 
+        4. 모든 응답이 수신 되었을때 >> reponse 확인 
+       */
+       req.onreadystatechange = function () {
+            console.log("객체상태 :" + this.readyState)
+            console.log("응답번호 :" + this.status)
+            // 모든 응답이 수신되고 응답번호가 200일때 콘솔에 response를 출력
+            if(this.readyState == 4 && this.status == 200) {
+                console.log(this.response);
+            }
+        }
+    
+       // 비동기 자바스크립트 확인을 위해
+       // 버튼을 눌렀을때 data.txt 의 값을 reponse 로 가져오기 
+       const btn = document.querySelector("#btn");
+        btn.addEventListener("click", function () {
+            const btnReq = new XMLHttpRequest();
+            btnReq.onreadystatechange = function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    console.log(this.response);
+                    // response을 p태그에 출력하세요
+                    console.log(typeof(this.response)) 
+                    document.querySelector("#print").innerHTML=this.response;
+                }
+            }
+            btnReq.open("GET", "./data.txt");
+            btnReq.send();
+        })
+
+        // 비동기 자바스크립트 확인을 위해
+        // 버튼을 눌렀을때 data.json 의 값을 reponse 로 consol 출력 
+        // json-btn 객체 가져와서 click 이벤트 발생 > 함수 실행 
+
+        const jsonprint = document.querySelector("#json-btn");
+        jsonprint.addEventListener("click", function () {
+            const jbtnReq = new XMLHttpRequest();
+            jbtnReq.onreadystatechange = function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    console.log(this.response);
+                    // response을 p태그에 출력하세요
+                    console.log(typeof(this.response)) 
+
+                    // json 형태의 문자열은 자바스크립트의 객체 
+                    const data = JSON.parse(this.response);
+                    console.log(typeof (data));
+                    // 자바스크립트 객체로 쉽게 접근 (자료형이 살아있음 )
+                    console.log(data.lsit);
+
+                    //p태그 안에 배열 값 넣어주기
+                    const pTag = document.querySelector("#json-print");
+                    for (let i =0; i<data.lsit.length; i++) {
+                        pTag.append(`${data.lsit[i]}`)
+                    }
+                   // document.querySelector("#json-print").innerHTML=this.response;
+                }
+            }
+            jbtnReq.open("GET", "./data.json");
+            jbtnReq.send();
+        })
+
+
+    </script>
+</body>
+</html>
